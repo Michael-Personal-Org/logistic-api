@@ -58,7 +58,7 @@ jobs:
         run: bun run lint
 
       - name: Run tests
-        run: bun run test --passWithNoTests
+        run: bun run test -- --passWithNoTests
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistic_api_test
@@ -70,4 +70,3 @@ jobs:
           RESEND_API_KEY: re_test_dummy_key
           EMAIL_FROM: test@test.com
           APP_URL: http://localhost:3000
-        run: bun run test

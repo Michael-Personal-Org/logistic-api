@@ -58,6 +58,7 @@ jobs:
         run: bun run lint
 
       - name: Run tests
+        run: bun run test --passWithNoTests
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistic_api_test

@@ -1,6 +1,5 @@
 import type { ISessionPort } from '@/features/users/application/ports/session.port'
 import { jwtUtils } from '@/shared/utils/jwt.utils'
-import { Env } from '@/shared/config/env'
 
 export interface LogoutInput {
   accessToken: string

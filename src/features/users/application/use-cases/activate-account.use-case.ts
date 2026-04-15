@@ -3,7 +3,6 @@ import { UserNotFoundError } from '@/features/users/domain/user.errors'
 import { AccountNotActiveError } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
 import { UserEntity } from '@/features/users/domain/user.entity'
-import { nanoid } from 'nanoid'
 
 export interface ActivateAccountInput {
   token: string

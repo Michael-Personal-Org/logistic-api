@@ -1,10 +1,8 @@
 import { nanoid } from 'nanoid'
-import { UserTokenEntity } from '../../domain/user.entity'
-import type { IUserRepository } from '../../domain/user.repository'
-import type { IEmailPort } from '../ports/email.port'
-import type { ITokenPort } from '../ports/token.port'
-import { privateDecrypt } from 'node:crypto'
-import { timeStamp } from 'node:console'
+import { UserTokenEntity } from '@/features/users/domain/user.entity'
+import type { IUserRepository } from '@/features/users/domain/user.repository'
+import type { IEmailPort } from '@/features/users/application/ports/email.port'
+import type { ITokenPort } from '@/features/users/application/ports/token.port'
 
 export interface RecoverPasswordInput {
   email: string

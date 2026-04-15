@@ -4,7 +4,7 @@ export interface TotpSetup {
   qrCodeDataUrl: string
 }
 
-export interface ITotpPrt {
+export interface ITotpPort {
   generateSetup(email: string): Promise<TotpSetup>
   verifyToken(token: string, secret: string): boolean
 }

@@ -31,7 +31,9 @@ export class RegisterUseCase {
   async execute(input: RegisterInput): Promise<RegisterOutput> {
     // 1. Verificar que el email no exista
     const existing = await this.userRepository.findByEmail(input.email)
-    if (existing) throw new UserAlreadyExistsError(input.email)
+    if (existing) {
+      throw new UserAlreadyExistsError(input.email)
+    }
 
     // 2. Hashear la contrasena
     const passwordHash = await passwordUtils.hash(input.password)

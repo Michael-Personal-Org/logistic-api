@@ -10,6 +10,7 @@ import type { ISessionPort } from '@/features/users/application/ports/session.po
 import type { ITotpPort } from '@/features/users/application/ports/totp.port'
 import { jwtUtils } from '@/shared/utils/jwt.utils'
 import { env } from '@/shared/config/env'
+import { parseExpiresIn } from '@/shared/utils/time.utils'
 
 export interface Verify2FAInput {
   userId: string
@@ -22,26 +23,6 @@ export interface Verify2FAOutput {
   refreshToken: string
   twoFactorEnabled: boolean
   message: string
-}
-
-// Convierte "7d", "15m", "1h" a segundos
-function parseExpiresIn(value: string): number {
-  const units: Record<string, number> = {
-    s: 1,
-    m: 60,
-    h: 3600,
-    d: 86400,
-  }
-  const match = value.match('/^(\d+)([smdh])$/')
-  if (!match) return 604800 // 7d por defecto
-
-  const amount = match[1]
-  const unit = match[2]
-
-  if (!amount || !unit) return 604800
-
-  const multiplier = units[unit] ?? 86400
-  return Number.parseInt(amount, 10) * multiplier
 }
 
 export class Verify2FAUseCase {

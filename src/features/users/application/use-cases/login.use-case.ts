@@ -115,5 +115,5 @@ function parseExpiresIn(value: string): number {
   if (!amount || !unit) return 604800
 
   const multiplier = units[unit] ?? 86400
-  return parseInt(amount, 10) * multiplier
+  return Number.parseInt(amount, 10) * multiplier
 }

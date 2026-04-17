@@ -6,5 +6,5 @@ export interface TotpSetup {
 
 export interface ITotpPort {
   generateSetup(email: string): Promise<TotpSetup>
-  verifyToken(token: string, secret: string): boolean
+  verifyToken(token: string, secret: string): Promise<boolean>
 }

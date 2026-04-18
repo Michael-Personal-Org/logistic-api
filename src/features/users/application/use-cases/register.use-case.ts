@@ -1,11 +1,11 @@
-import { nanoid } from 'nanoid'
+import type { IEmailPort } from '@/features/users/application/ports/email.port'
+import type { ITokenPort } from '@/features/users/application/ports/token.port'
 import { UserEntity } from '@/features/users/domain/user.entity'
 import { UserTokenEntity } from '@/features/users/domain/user.entity'
 import { UserAlreadyExistsError } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
-import type { IEmailPort } from '@/features/users/application/ports/email.port'
-import type { ITokenPort } from '@/features/users/application/ports/token.port'
 import { passwordUtils } from '@/shared/utils/password.utils'
+import { nanoid } from 'nanoid'
 
 // Input y Output
 export interface RegisterInput {
@@ -44,8 +44,8 @@ export class RegisterUseCase {
       id: nanoid(),
       email: input.email.toLowerCase().trim(),
       passwordHash,
-      firstName: input.firstName.toLowerCase().trim(),
-      lastName: input.lastName.toLowerCase().trim(),
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
       status: 'pending',
       twoFactorSecret: null,
       twoFactorEnabled: false,

@@ -1,15 +1,15 @@
-import { UserEntity } from '@/features/users/domain/user.entity'
-import {
-  UserNotFoundError,
-  InvalidTwoFactorCodeError,
-  TwoFactorNotEnabledError,
-  AccountNotActiveError,
-} from '@/features/users/domain/user.errors'
-import type { IUserRepository } from '@/features/users/domain/user.repository'
 import type { ISessionPort } from '@/features/users/application/ports/session.port'
 import type { ITotpPort } from '@/features/users/application/ports/totp.port'
-import { jwtUtils } from '@/shared/utils/jwt.utils'
+import { UserEntity } from '@/features/users/domain/user.entity'
+import {
+  AccountNotActiveError,
+  InvalidTwoFactorCodeError,
+  TwoFactorNotEnabledError,
+  UserNotFoundError,
+} from '@/features/users/domain/user.errors'
+import type { IUserRepository } from '@/features/users/domain/user.repository'
 import { env } from '@/shared/config/env'
+import { jwtUtils } from '@/shared/utils/jwt.utils'
 import { parseExpiresIn } from '@/shared/utils/time.utils'
 
 export interface Verify2FAInput {
@@ -50,7 +50,7 @@ export class Verify2FAUseCase {
     }
 
     // 4. Verificar el codigo TOTP contra el secret generado
-    const isValid = this.totpPort.verifyToken(input.code, user.twoFactorSecret)
+    const isValid = await this.totpPort.verifyToken(input.code, user.twoFactorSecret)
     if (!isValid) {
       throw new InvalidTwoFactorCodeError()
     }

@@ -1,4 +1,3 @@
-import { measureMemory } from 'node:vm'
 import type { IEmailPort } from '@/features/users/application/ports/email.port'
 import type { ITokenPort } from '@/features/users/application/ports/token.port'
 import { UserAlreadyExistsError } from '@/features/users/domain/user.errors'
@@ -6,8 +5,8 @@ import type { IUserRepository } from '@/features/users/domain/user.repository'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RegisterUseCase } from './register.use-case'
 
-// ----- Mocks -----
-// Implementaciones falsas que cumplen del contrato de la interfaz
+// ─── Mocks ───────────────────────────────────────────────
+// Implementaciones falsas que cumplen el contrato de la interfaz
 const mockUserRepository: IUserRepository = {
   findById: vi.fn(),
   findByEmail: vi.fn(),
@@ -30,15 +29,15 @@ const mockTokenPort: ITokenPort = {
   getExpirationDate: vi.fn().mockReturnValue(new Date('2099-01-01')),
 }
 
-// ----- Factory del use-case -----
+// ─── Factory del use-case ────────────────────────────────
 function makeUseCase() {
   return new RegisterUseCase(mockUserRepository, mockEmailPort, mockTokenPort)
 }
 
-// ----- Tests -----
+// ─── Tests ───────────────────────────────────────────────
 describe('RegisterUseCase', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.clearAllMocks() // Limpia contadores y return values entre tests
   })
 
   describe('cuando el registro es exitoso', () => {

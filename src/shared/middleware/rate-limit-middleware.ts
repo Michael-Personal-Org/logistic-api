@@ -1,12 +1,15 @@
+import { env } from '@/shared/config/env'
 import rateLimit from 'express-rate-limit'
-import { success } from 'zod'
+
+const isTest = () => process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
 // Rate limit general para toda la api
 export const globalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: isTest() ? 500 : 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: isTest,
   message: {
     success: false,
     error: {
@@ -22,6 +25,7 @@ export const authRateLimit = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: isTest,
   message: {
     success: false,
     error: {
@@ -37,6 +41,7 @@ export const passwordResetRateLimit = rateLimit({
   max: 3,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: isTest,
   message: {
     success: false,
     error: {

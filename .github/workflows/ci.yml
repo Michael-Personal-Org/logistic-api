@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   pull_request:
@@ -8,11 +8,50 @@ on:
   push:
     branches:
       - develop
+    tags:
+      - 'v*'
 
 jobs:
-  ci:
-    name: Typecheck, Lint & Test
+  # ─── STAGE 1: FAST CI ────────────────────────────────────
+  fast-ci:
+    name: Typecheck, Lint & Unit Tests
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Unit tests
+        run: bun run test:unit
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          REDIS_URL: redis://localhost:6379
+          JWT_ACCESS_SECRET: test_secret_access_muy_largo_de_al_menos_32_chars
+          JWT_REFRESH_SECRET: test_secret_refresh_muy_largo_de_al_menos_32_chars
+          JWT_ACCESS_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+          RESEND_API_KEY: re_test_dummy_key
+          EMAIL_FROM: test@test.com
+          APP_URL: http://localhost:3000
+
+  # ─── STAGE 2: INTEGRATION & E2E TESTS ───────────────────
+  test:
+    name: Integration & E2E Tests
+    runs-on: ubuntu-latest
+    needs: fast-ci
 
     services:
       postgres:
@@ -40,25 +79,22 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Install dependencies
         run: bun install
 
-      - name: Typecheck
-        run: bun run typecheck
+      - name: Run migrations
+        run: bun run db:migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistic_api_test
 
-      - name: Lint
-        run: bun run lint
-
-      - name: Run tests
-        run: bun run test
+      - name: Integration tests
+        run: bun run test:integration
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistic_api_test
@@ -70,3 +106,80 @@ jobs:
           RESEND_API_KEY: re_test_dummy_key
           EMAIL_FROM: test@test.com
           APP_URL: http://localhost:3000
+
+      - name: E2E tests
+        run: bun run test:e2e
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/logistic_api_test
+          REDIS_URL: redis://localhost:6379
+          JWT_ACCESS_SECRET: test_secret_access_muy_largo_de_al_menos_32_chars
+          JWT_REFRESH_SECRET: test_secret_refresh_muy_largo_de_al_menos_32_chars
+          JWT_ACCESS_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+          RESEND_API_KEY: re_test_dummy_key
+          EMAIL_FROM: test@test.com
+          APP_URL: http://localhost:3000
+
+  # ─── STAGE 3: DOCKER BUILD & PUSH ───────────────────────
+  docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─── STAGE 4: DEPLOY ─────────────────────────────────────
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            export GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+            export GHCR_USER="${{ github.actor }}"
+            /home/appuser/deploy.sh

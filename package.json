@@ -16,7 +16,7 @@
     "test": "vitest --passWithNoTests",
     "test:unit": "vitest run --config vitest.unit.config.ts --passWithNoTests",
     "test:integration": "vitest run --config vitest.integration.config.ts --passWithNoTests",
-    "test:e2e": "vitest run --config vitest.integration.config.ts --passWithNoTests",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts --passWithNoTests",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

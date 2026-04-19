@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ['src/tests/integration.setup.ts'],
     include: ['src/**/*.integration.test.ts'],
     fileParallelism: false,
+    silent: 'passed-only',
   },
   resolve: {
     alias: {

@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ['src/tests/integration.setup.ts'],
     include: ['src/**/*.e2e.test.ts'],
     fileParallelism: false,
+    silent: 'passed-only', // ← AÑADIR ESTO (suprime logs de tests OK)
   },
   resolve: {
     alias: {

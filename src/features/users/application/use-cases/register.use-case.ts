@@ -5,7 +5,6 @@ import { UserTokenEntity } from '@/features/users/domain/user.entity'
 import { UserAlreadyExistsError } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
 import { passwordUtils } from '@/shared/utils/password.utils'
-import { nanoid } from 'nanoid'
 
 // Input y Output
 export interface RegisterInput {
@@ -41,7 +40,7 @@ export class RegisterUseCase {
     // 3. Crear la entidad
     const now = new Date()
     const user = UserEntity.create({
-      id: nanoid(),
+      id: crypto.randomUUID(),
       email: input.email.toLowerCase().trim(),
       passwordHash,
       firstName: input.firstName.trim(),
@@ -62,7 +61,7 @@ export class RegisterUseCase {
     const expiresAt = this.tokenPort.getExpirationDate(60 * 24)
 
     const userToken = UserTokenEntity.create({
-      id: nanoid(),
+      id: crypto.randomUUID(),
       userId: user.id,
       token: activationToken,
       type: 'activation',

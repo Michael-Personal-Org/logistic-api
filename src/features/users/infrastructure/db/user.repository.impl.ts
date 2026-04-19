@@ -49,6 +49,9 @@ export class UserRepositoryImpl implements IUserRepository {
       const row = result[0]
       return row ? this.toEntity(row) : null
     } catch (error) {
+      if (error instanceof Error && error.message.includes('invalid input syntax for type uuid')) {
+        return null
+      }
       throw new DatabaseError(`Error al buscar usuario por ID: ${error}`)
     }
   }

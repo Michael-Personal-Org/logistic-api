@@ -1,8 +1,7 @@
-import { nanoid } from 'nanoid'
-import { UserTokenEntity } from '@/features/users/domain/user.entity'
-import type { IUserRepository } from '@/features/users/domain/user.repository'
 import type { IEmailPort } from '@/features/users/application/ports/email.port'
 import type { ITokenPort } from '@/features/users/application/ports/token.port'
+import { UserTokenEntity } from '@/features/users/domain/user.entity'
+import type { IUserRepository } from '@/features/users/domain/user.repository'
 
 export interface RecoverPasswordInput {
   email: string
@@ -42,7 +41,7 @@ export class RecoverPasswordUseCase {
     const expiresAt = this.tokenPort.getExpirationDate(60)
 
     const userToken = UserTokenEntity.create({
-      id: nanoid(),
+      id: crypto.randomUUID(),
       userId: user.id,
       token: resetToken,
       type: 'password_reset',

@@ -180,6 +180,6 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            export GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-            export GHCR_USER="${{ github.actor }}"
+            export GHCR_TOKEN="${{ secrets.GHCR_PAT }}"
+            export GHCR_USER="Michael-2405"
             /home/appuser/deploy.sh

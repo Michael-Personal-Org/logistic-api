@@ -65,7 +65,7 @@ userRouter.post('/2fa/verify', validateBody(Verify2FADto), controller.verify2FA)
 // Rutas protegidas
 userRouter.post('/logout', authMiddleware, controller.logout)
 userRouter.post('/2fa/enable', authMiddleware, controller.enable2FA)
-userRouter.post(
+userRouter.delete(
   '/account',
   authMiddleware,
   validateBody(DeleteAccountDto),

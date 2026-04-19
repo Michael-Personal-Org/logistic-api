@@ -3,6 +3,7 @@ import {
   redisClient,
 } from '@/features/users/infrastructure/cache/redis.session.store'
 import { UnauthorizedError } from '@/shared/errors/app.error'
+import { ValidationError } from '@/shared/errors/app.error'
 import { jwtUtils } from '@/shared/utils/jwt.utils'
 import type { NextFunction, Request, Response } from 'express'
 import type { z } from 'zod'
@@ -63,7 +64,7 @@ export function validateBody<T>(schema: z.ZodSchema<T>) {
       const messages = result.error.issues
         .map((e) => `${e.path.join('.')}: ${e.message}`)
         .join(', ')
-      next(new Error(messages))
+      next(new ValidationError(messages))
       return
     }
     req.body = result.data

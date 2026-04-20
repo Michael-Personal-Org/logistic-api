@@ -1,10 +1,11 @@
 import type { UserProps, UserTokenProps } from '@/features/users/domain/user.entity'
 import { UserEntity, UserTokenEntity } from '@/features/users/domain/user.entity'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
+import type { FindManyOptions, FindManyResult } from '@/features/users/domain/user.repository'
 import { userTokens, users } from '@/features/users/infrastructure/db/user.schema'
 import type { Database } from '@/shared/config/database'
 import { DatabaseError } from '@/shared/errors/app.error'
-import { and, eq, lt } from 'drizzle-orm'
+import { type SQL, and, count, eq, isNull, lt } from 'drizzle-orm'
 
 export class UserRepositoryImpl implements IUserRepository {
   constructor(private readonly db: Database) {}
@@ -65,6 +66,33 @@ export class UserRepositoryImpl implements IUserRepository {
       return row ? this.toEntity(row) : null
     } catch (error) {
       throw new DatabaseError(`Error al buscar usuario por email: ${error}`)
+    }
+  }
+
+  async findMany(options: FindManyOptions): Promise<FindManyResult> {
+    try {
+      const { page, limit, role, status } = options
+      const offset = (page - 1) * limit
+
+      const filters: SQL[] = [isNull(users.deletedAt)]
+      if (role) filters.push(eq(users.role, role))
+      if (status) filters.push(eq(users.status, status))
+
+      const where = and(...filters)
+
+      const [rows, countResult] = await Promise.all([
+        this.db.select().from(users).where(where).limit(limit).offset(offset),
+        this.db.select({ count: count() }).from(users).where(where),
+      ])
+
+      const total = countResult[0]?.count ?? 0
+
+      return {
+        users: rows.map((row) => this.toEntity(row)),
+        total: Number(total),
+      }
+    } catch (error) {
+      throw new DatabaseError(`Error al listar usuarios: ${error}`)
     }
   }
 

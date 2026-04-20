@@ -1,0 +1,15 @@
+export const ROLES = {
+  CLIENT: 'CLIENT',
+  DRIVER: 'DRIVER',
+  OPERATOR: 'OPERATOR',
+  ADMIN: 'ADMIN',
+} as const
+
+export type Role = (typeof ROLES)[keyof typeof ROLES]
+
+export const ROLE_GROUPS = {
+  ALL: [ROLES.CLIENT, ROLES.DRIVER, ROLES.ADMIN, ROLES.OPERATOR],
+  STAFF: [ROLES.ADMIN, ROLES.OPERATOR],
+  FIELD: [ROLES.DRIVER],
+  EXTERNAL: [ROLES.CLIENT],
+} as const

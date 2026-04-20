@@ -1,13 +1,11 @@
 import { boolean, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 
 // --- Enums ---
-export const userStatusEnum = pgEnum('user_status', [
-  'pending', // Registrado, email no verificado
-  'active', // Cuenta activa y verificada
-  'suspended', // Suspendido por admin
-])
+export const userStatusEnum = pgEnum('user_status', ['pending', 'active', 'suspended'])
 
 export const tokenTypeEnum = pgEnum('token_type', ['activation', 'password_reset'])
+
+export const userRoleEnum = pgEnum('user_role', ['CLIENT', 'DRIVER', 'OPERATOR', 'ADMIN'])
 
 // --- Tabla principal ---
 export const users = pgTable('users', {
@@ -17,6 +15,8 @@ export const users = pgTable('users', {
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   status: userStatusEnum('status').notNull().default('pending'),
+
+  role: userRoleEnum('role').notNull().default('CLIENT'),
 
   // 2FA
   twoFactorSecret: varchar('two_factor_secret', { length: 255 }),

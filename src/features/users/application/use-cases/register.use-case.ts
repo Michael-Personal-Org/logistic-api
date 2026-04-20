@@ -46,6 +46,7 @@ export class RegisterUseCase {
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
       status: 'pending',
+      role: 'CLIENT',
       twoFactorSecret: null,
       twoFactorEnabled: false,
       createdAt: now,

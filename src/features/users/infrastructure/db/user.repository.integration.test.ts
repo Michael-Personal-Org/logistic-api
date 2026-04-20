@@ -24,6 +24,7 @@ function makeUserEntity(overrides: Partial<Parameters<typeof UserEntity.create>[
     firstName: 'John',
     lastName: 'Doe',
     status: 'pending',
+    role: 'CLIENT',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),

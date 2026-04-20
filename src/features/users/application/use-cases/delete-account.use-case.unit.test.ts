@@ -20,6 +20,7 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
     firstName: 'John',
     lastName: 'Doe',
     status: 'active',
+    role: 'CLIENT',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),
@@ -65,7 +66,11 @@ describe('DeleteAccountUseCase', () => {
     vi.mocked(mockSessionPort.blacklistToken).mockResolvedValue()
     vi.mocked(mockSessionPort.deleteRefreshToken).mockResolvedValue()
 
-    accessToken = jwtUtils.signAccessToken({ sub: 'user-123', email: 'john@example.com' })
+    accessToken = jwtUtils.signAccessToken({
+      sub: 'user-123',
+      email: 'john@example.com',
+      role: 'CLIENT',
+    })
     passwordHash = await hash('Password1!')
   })
 

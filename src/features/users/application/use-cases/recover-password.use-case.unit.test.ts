@@ -28,6 +28,7 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
 const mockUserRepository: IUserRepository = {
   findById: vi.fn(),
   findByEmail: vi.fn(),
+  findMany: vi.fn(),
   save: vi.fn(),
   update: vi.fn(),
   softDelete: vi.fn(),

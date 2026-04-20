@@ -1,6 +1,7 @@
 import {
   AppError,
   ConflictError,
+  ForbiddenError,
   NotFoundError,
   UnauthorizedError,
 } from '@/shared/errors/app.error'
@@ -56,5 +57,11 @@ export class TwoFactorNotEnabledError extends AppError {
 export class InvalidTwoFactorCodeError extends UnauthorizedError {
   constructor() {
     super('Codigo 2FA invalido')
+  }
+}
+
+export class InsufficientPermissionsError extends ForbiddenError {
+  constructor(message = 'No tienes permisos suficientes para realizar esta acción') {
+    super(message)
   }
 }

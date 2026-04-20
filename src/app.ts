@@ -1,3 +1,4 @@
+import { adminRouter } from '@/features/users/interface/admin.router'
 import { userRouter } from '@/features/users/interface/user.router'
 import { healthRouter } from '@/shared/health/health.router'
 import { corsMiddleware } from '@/shared/middleware/cors-middleware'
@@ -43,6 +44,8 @@ export function createApp() {
   app.use('/api/v1/auth/forgot-password', passwordResetRateLimit)
 
   app.use('/api/v1/auth', userRouter)
+
+  app.use('/api/v1/admin', adminRouter)
 
   // ---- 404 Handler ----
   app.use((_req, res) => {

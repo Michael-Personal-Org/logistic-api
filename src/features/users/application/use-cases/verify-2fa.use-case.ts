@@ -67,7 +67,7 @@ export class Verify2FAUseCase {
     }
 
     // 6. Eliminar tokens (flujo de login completado o 2FA activado)
-    const payload = { sub: user.id, email: user.email }
+    const payload = { sub: user.id, email: user.email, role: user.role }
     const accessToken = jwtUtils.signAccessToken(payload)
     const refreshToken = jwtUtils.signRefreshToken(payload)
 

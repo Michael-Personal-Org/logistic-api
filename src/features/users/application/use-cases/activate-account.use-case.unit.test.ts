@@ -13,6 +13,7 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
     firstName: 'John',
     lastName: 'Doe',
     status: 'pending',
+    role: 'CLIENT',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),

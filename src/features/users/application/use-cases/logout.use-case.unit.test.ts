@@ -29,6 +29,7 @@ describe('LogoutUseCase', () => {
       const accessToken = jwtUtils.signAccessToken({
         sub: 'user-123',
         email: 'john@example.com',
+        role: 'CLIENT',
       })
 
       const useCase = makeUseCase()
@@ -42,6 +43,7 @@ describe('LogoutUseCase', () => {
       const accessToken = jwtUtils.signAccessToken({
         sub: 'user-123',
         email: 'john@example.com',
+        role: 'CLIENT',
       })
 
       const useCase = makeUseCase()
@@ -55,6 +57,7 @@ describe('LogoutUseCase', () => {
       const accessToken = jwtUtils.signAccessToken({
         sub: 'user-123',
         email: 'john@example.com',
+        role: 'CLIENT',
       })
 
       const useCase = makeUseCase()

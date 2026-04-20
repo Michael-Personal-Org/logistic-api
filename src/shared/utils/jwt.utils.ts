@@ -1,9 +1,11 @@
 import jwt, { type SignOptions } from 'jsonwebtoken'
 import { env } from '@/shared/config/env'
+import type { Role } from '@/shared/constants/roles'
 
 export interface JwtPayload {
   sub: string
   email: string
+  role: Role
   iat?: number
   exp?: number
 }

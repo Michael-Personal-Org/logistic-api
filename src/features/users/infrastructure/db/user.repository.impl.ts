@@ -18,6 +18,7 @@ export class UserRepositoryImpl implements IUserRepository {
       firstName: row.firstName,
       lastName: row.lastName,
       status: row.status,
+      role: row.role,
       twoFactorSecret: row.twoFactorSecret ?? null,
       twoFactorEnabled: row.twoFactorEnabled,
       createdAt: row.createdAt,

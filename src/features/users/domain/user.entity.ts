@@ -1,4 +1,5 @@
 export type UserStatus = 'pending' | 'active' | 'suspended'
+export type UserRole = 'CLIENT' | 'DRIVER' | 'OPERATOR' | 'ADMIN'
 
 export interface UserProps {
   id: string
@@ -7,6 +8,7 @@ export interface UserProps {
   firstName: string
   lastName: string
   status: UserStatus
+  role: UserRole
   twoFactorSecret: string | null
   twoFactorEnabled: boolean
   createdAt: Date
@@ -50,6 +52,9 @@ export class UserEntity {
   get status(): UserStatus {
     return this.props.status
   }
+  get role(): UserRole {
+    return this.props.role
+  }
   get twoFactorSecret(): string | null {
     return this.props.twoFactorSecret
   }
@@ -85,6 +90,23 @@ export class UserEntity {
 
   hasTwoFactorEnabled(): boolean {
     return this.props.twoFactorEnabled && this.props.twoFactorSecret !== null
+  }
+
+  // Helpers de rol
+  isClient(): boolean {
+    return this.props.role === 'CLIENT'
+  }
+  isDriver(): boolean {
+    return this.props.role === 'DRIVER'
+  }
+  isOperator(): boolean {
+    return this.props.role === 'OPERATOR'
+  }
+  isAdmin(): boolean {
+    return this.props.role === 'ADMIN'
+  }
+  isStaff(): boolean {
+    return this.props.role === 'OPERATOR' || this.props.role === 'ADMIN'
   }
 
   fullName(): string {

@@ -1,13 +1,13 @@
+import type { ISessionPort } from '@/features/users/application/ports/session.port'
 import {
-  InvalidCredentialsError,
   AccountNotActiveError,
   AccountSuspendedError,
+  InvalidCredentialsError,
 } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
-import type { ISessionPort } from '@/features/users/application/ports/session.port'
-import { passwordUtils } from '@/shared/utils/password.utils'
-import { jwtUtils } from '@/shared/utils/jwt.utils'
 import { env } from '@/shared/config/env'
+import { jwtUtils } from '@/shared/utils/jwt.utils'
+import { passwordUtils } from '@/shared/utils/password.utils'
 import { parseExpiresIn } from '@/shared/utils/time.utils'
 
 export interface LoginInput {
@@ -77,7 +77,7 @@ export class LoginUseCase {
     }
 
     // 6. Generar tokens
-    const payload = { sub: user.id, email: user.email }
+    const payload = { sub: user.id, email: user.email, role: user.role }
     const accessToken = jwtUtils.signAccessToken(payload)
     const refreshToken = jwtUtils.signRefreshToken(payload)
 

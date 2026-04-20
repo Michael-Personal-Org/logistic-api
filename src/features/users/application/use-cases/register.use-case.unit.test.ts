@@ -10,6 +10,7 @@ import { RegisterUseCase } from './register.use-case'
 const mockUserRepository: IUserRepository = {
   findById: vi.fn(),
   findByEmail: vi.fn(),
+  findMany: vi.fn(),
   save: vi.fn(),
   update: vi.fn(),
   softDelete: vi.fn(),

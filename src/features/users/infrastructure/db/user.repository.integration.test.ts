@@ -1,3 +1,7 @@
+import {
+  clientProfiles,
+  driverProfiles,
+} from '@/features/profiles/infrastructure/db/profile.schema'
 import { UserEntity, UserTokenEntity } from '@/features/users/domain/user.entity'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
@@ -12,7 +16,7 @@ const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL no esta definida')
 
 const client = postgres(databaseUrl)
-const db = drizzle(client, { schema: { users, userTokens } })
+const db = drizzle(client, { schema: { users, userTokens, clientProfiles, driverProfiles } })
 const repository = new UserRepositoryImpl(db)
 
 // ----- Helpers -----

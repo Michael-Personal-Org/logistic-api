@@ -2,12 +2,12 @@ import { db } from '@/shared/config/database'
 import { ROLES } from '@/shared/constants/roles'
 import { Router } from 'express'
 
-// Infrastructure
+import { AuditLogRepositoryImpl } from '@/features/audit/infrastructure/db/audit-log.repository.impl'
 import { ProfileRepositoryImpl } from '@/features/profiles/infrastructure/db/profile.repository.impl'
 import { UserRepositoryImpl } from '@/features/users/infrastructure/db/user.repository.impl'
 
+import { CreateAuditLogUseCase } from '@/features/audit/application/use-cases/create-audit-log.use-case'
 import { ApproveClientProfileUseCase } from '@/features/profiles/application/use-cases/approve-client-profile.use-case'
-// Use Cases
 import { CreateClientProfileUseCase } from '@/features/profiles/application/use-cases/create-client-profile.use-case'
 import { CreateDriverProfileUseCase } from '@/features/profiles/application/use-cases/create-driver-profile.use-case'
 import { GetClientProfileUseCase } from '@/features/profiles/application/use-cases/get-client-profile.use-case'
@@ -20,10 +20,9 @@ import {
   requireRole,
   validateBody,
 } from '@/features/users/interface/user.middleware'
-// Interface
+import { AuditService } from '@/shared/services/audit.service'
 import { ProfileController } from './profile.controller'
 
-// DTOs
 import { CreateClientProfileDto } from './dtos/create-client-profile.dto'
 import { CreateDriverProfileDto } from './dtos/create-driver-profile.dto'
 import { UpdateClientProfileDto } from './dtos/update-client-profile.dto'
@@ -32,12 +31,14 @@ import { UpdateDriverProfileDto } from './dtos/update-driver-profile.dto'
 // ─── Dependency Injection ────────────────────────────────
 const profileRepository = new ProfileRepositoryImpl(db)
 const userRepository = new UserRepositoryImpl(db)
+const auditLogRepository = new AuditLogRepositoryImpl(db)
+const auditService = new AuditService(new CreateAuditLogUseCase(auditLogRepository))
 
 const controller = new ProfileController(
   new CreateClientProfileUseCase(profileRepository, userRepository),
   new UpdateClientProfileUseCase(profileRepository),
   new GetClientProfileUseCase(profileRepository),
-  new ApproveClientProfileUseCase(profileRepository),
+  new ApproveClientProfileUseCase(profileRepository, auditService),
   new CreateDriverProfileUseCase(profileRepository, userRepository),
   new UpdateDriverProfileUseCase(profileRepository),
   new GetDriverProfileUseCase(profileRepository)
@@ -45,8 +46,6 @@ const controller = new ProfileController(
 
 export const profileRouter = Router()
 
-// ─── Client Profile Routes ───────────────────────────────
-// El cliente gestiona su propio perfil
 profileRouter.post(
   '/client',
   authMiddleware,
@@ -70,7 +69,6 @@ profileRouter.get(
   controller.getMyClientProfile
 )
 
-// ADMIN y OPERATOR pueden ver y aprobar perfiles de clientes
 profileRouter.get(
   '/client/:userId',
   authMiddleware,
@@ -85,8 +83,6 @@ profileRouter.patch(
   controller.approveClientProfileByUserId
 )
 
-// ─── Driver Profile Routes ───────────────────────────────
-// El conductor gestiona su propio perfil
 profileRouter.post(
   '/driver',
   authMiddleware,
@@ -110,7 +106,6 @@ profileRouter.get(
   controller.getMyDriverProfile
 )
 
-// ADMIN y OPERATOR pueden ver perfiles de conductores
 profileRouter.get(
   '/driver/:userId',
   authMiddleware,

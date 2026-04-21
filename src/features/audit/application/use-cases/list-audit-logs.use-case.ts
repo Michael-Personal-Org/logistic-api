@@ -2,12 +2,12 @@ import type { AuditAction, AuditResource } from '@/features/audit/domain/audit-l
 import type { IAuditLogRepository } from '@/features/audit/domain/audit-log.repository'
 
 export interface ListAuditLogsInput {
-  userId?: string
-  action?: AuditAction
-  resource?: AuditResource
-  resourceId?: string
-  from?: Date
-  to?: Date
+  userId?: string | undefined
+  action?: AuditAction | undefined
+  resource?: AuditResource | undefined
+  resourceId?: string | undefined
+  from?: Date | undefined
+  to?: Date | undefined
   page: number
   limit: number
 }

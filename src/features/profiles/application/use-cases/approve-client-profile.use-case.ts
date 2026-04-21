@@ -2,7 +2,7 @@ import { AUDIT_ACTIONS, AUDIT_RESOURCES } from '@/features/audit/domain/audit-lo
 import { ClientProfileEntity } from '@/features/profiles/domain/client-profile.entity'
 import { ProfileNotFoundError } from '@/features/profiles/domain/profile.errors'
 import type { IProfileRepository } from '@/features/profiles/domain/profile.repository'
-import type { AuditService } from '@/shared/service/audit.service'
+import type { AuditService } from '@/shared/services/audit.service'
 
 export interface ApproveClientProfileInput {
   userId: string

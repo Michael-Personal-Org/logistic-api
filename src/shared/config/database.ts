@@ -3,12 +3,13 @@ import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
+import { trucks } from '@/features/trucks/infrastructure/db/truck.schema'
 import { userTokens, users } from '@/features/users/infrastructure/db/user.schema'
 import { env } from '@/shared/config/env'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-const schema = { users, userTokens, clientProfiles, driverProfiles, auditLogs }
+const schema = { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks }
 
 const client = postgres(env.DATABASE_URL, {
   max: env.NODE_ENV === 'production' ? 20 : 5,

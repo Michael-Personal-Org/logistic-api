@@ -4,6 +4,7 @@ import {
   UserNotFoundError,
 } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
+import type { AuditService } from '@/shared/services/audit.service'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UpdateUserStatusUseCase } from './update-user-status.use-case'
 
@@ -38,8 +39,12 @@ const mockUserRepository: IUserRepository = {
   deleteExpiredTokens: vi.fn(),
 }
 
+const mockAuditService = {
+  log: vi.fn().mockResolvedValue(undefined),
+} as unknown as AuditService
+
 function makeUseCase() {
-  return new UpdateUserStatusUseCase(mockUserRepository)
+  return new UpdateUserStatusUseCase(mockUserRepository, mockAuditService)
 }
 
 describe('UpdateUserStatusUseCase', () => {
@@ -56,6 +61,7 @@ describe('UpdateUserStatusUseCase', () => {
       const result = await useCase.execute({
         targetUserId: 'user-123',
         newStatus: 'suspended',
+        performedBy: 'admin-456',
       })
 
       expect(mockUserRepository.update).toHaveBeenCalledOnce()
@@ -69,6 +75,7 @@ describe('UpdateUserStatusUseCase', () => {
       const result = await useCase.execute({
         targetUserId: 'user-123',
         newStatus: 'active',
+        performedBy: 'admin-456',
       })
 
       expect(mockUserRepository.update).toHaveBeenCalledOnce()
@@ -83,7 +90,7 @@ describe('UpdateUserStatusUseCase', () => {
       const useCase = makeUseCase()
 
       await expect(
-        useCase.execute({ targetUserId: 'user-123', newStatus: 'suspended' })
+        useCase.execute({ targetUserId: 'user-123', newStatus: 'suspended', performedBy: '' })
       ).rejects.toThrow(InsufficientPermissionsError)
     })
   })
@@ -95,7 +102,11 @@ describe('UpdateUserStatusUseCase', () => {
       const useCase = makeUseCase()
 
       await expect(
-        useCase.execute({ targetUserId: 'nonexistent', newStatus: 'suspended' })
+        useCase.execute({
+          targetUserId: 'nonexistent',
+          newStatus: 'suspended',
+          performedBy: 'admin-456',
+        }) // ← agregar
       ).rejects.toThrow(UserNotFoundError)
     })
   })

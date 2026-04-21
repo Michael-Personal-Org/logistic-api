@@ -4,6 +4,7 @@ import {
   UserNotFoundError,
 } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
+import type { AuditService } from '@/shared/services/audit.service'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ChangeUserRoleUseCase } from './change-user-role.use-case'
 
@@ -38,8 +39,12 @@ const mockUserRepository: IUserRepository = {
   deleteExpiredTokens: vi.fn(),
 }
 
+const mockAuditService = {
+  log: vi.fn().mockResolvedValue(undefined),
+} as unknown as AuditService
+
 function makeUseCase() {
-  return new ChangeUserRoleUseCase(mockUserRepository)
+  return new ChangeUserRoleUseCase(mockUserRepository, mockAuditService)
 }
 
 describe('ChangeUserRoleUseCase', () => {
@@ -56,6 +61,7 @@ describe('ChangeUserRoleUseCase', () => {
       const result = await useCase.execute({
         targetUserId: 'user-123',
         newRole: 'OPERATOR',
+        performedBy: 'admin-456', // ← NUEVO
       })
 
       expect(mockUserRepository.update).toHaveBeenCalledOnce()
@@ -71,6 +77,7 @@ describe('ChangeUserRoleUseCase', () => {
       const result = await useCase.execute({
         targetUserId: 'user-123',
         newRole: 'DRIVER',
+        performedBy: 'admin-456', // ← agregar
       })
 
       expect(mockUserRepository.update).not.toHaveBeenCalled()
@@ -85,7 +92,7 @@ describe('ChangeUserRoleUseCase', () => {
       const useCase = makeUseCase()
 
       await expect(
-        useCase.execute({ targetUserId: 'user-123', newRole: 'OPERATOR' })
+        useCase.execute({ targetUserId: 'user-123', newRole: 'OPERATOR', performedBy: 'admin-456' }) // ← agregar
       ).rejects.toThrow(InsufficientPermissionsError)
     })
   })
@@ -97,7 +104,11 @@ describe('ChangeUserRoleUseCase', () => {
       const useCase = makeUseCase()
 
       await expect(
-        useCase.execute({ targetUserId: 'nonexistent', newRole: 'OPERATOR' })
+        useCase.execute({
+          targetUserId: 'nonexistent',
+          newRole: 'OPERATOR',
+          performedBy: 'admin-456',
+        }) // ← agregar
       ).rejects.toThrow(UserNotFoundError)
     })
   })

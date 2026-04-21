@@ -1,3 +1,4 @@
+import { AUDIT_ACTIONS, AUDIT_RESOURCES } from '@/features/audit/domain/audit-log.constants'
 import { UserEntity } from '@/features/users/domain/user.entity'
 import type { UserRole } from '@/features/users/domain/user.entity'
 import {
@@ -5,10 +6,13 @@ import {
   UserNotFoundError,
 } from '@/features/users/domain/user.errors'
 import type { IUserRepository } from '@/features/users/domain/user.repository'
+import type { AuditService } from '@/shared/service/audit.service'
 
 export interface ChangeUserRoleInput {
   targetUserId: string
   newRole: UserRole
+  performedBy: string
+  ipAddress?: string
 }
 
 export interface ChangeUserRoleOutput {
@@ -16,7 +20,10 @@ export interface ChangeUserRoleOutput {
 }
 
 export class ChangeUserRoleUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly auditService: AuditService
+  ) {}
 
   async execute(input: ChangeUserRoleInput): Promise<ChangeUserRoleOutput> {
     const user = await this.userRepository.findById(input.targetUserId)
@@ -39,6 +46,14 @@ export class ChangeUserRoleUseCase {
     })
 
     await this.userRepository.update(updatedUser)
+
+    await this.auditService.log(
+      { userId: input.performedBy, ipAddress: input.ipAddress },
+      AUDIT_ACTIONS.USER_ROLE_CHANGED,
+      AUDIT_RESOURCES.USER,
+      input.targetUserId,
+      { previouesRole: user.role, newRole: input.newRole }
+    )
 
     return {
       message: `Rol actualizado a ${input.newRole} correctamente.`,

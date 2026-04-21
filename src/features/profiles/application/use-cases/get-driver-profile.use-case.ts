@@ -14,7 +14,7 @@ export interface UpdateDriverProfileOutput {
   message: string
 }
 
-export class UpdateDriverProfileUseCase {
+export class GetDriverProfileUseCase {
   constructor(private readonly profileRepository: IProfileRepository) {}
 
   async execute(input: UpdateDriverProfileInput): Promise<UpdateDriverProfileOutput> {

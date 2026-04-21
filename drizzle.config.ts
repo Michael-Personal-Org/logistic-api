@@ -13,6 +13,7 @@ export default defineConfig({
   schema: [
     './src/features/users/infrastructure/db/user.schema.ts',
     './src/features/profiles/infrastructure/db/profile.schema.ts',
+    './src/features/audit/infrastructure/db/audit-log.schema.ts',
   ],
   out: './src/db/migrations',
   dbCredentials: {

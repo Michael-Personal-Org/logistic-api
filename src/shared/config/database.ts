@@ -1,3 +1,4 @@
+import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import {
   clientProfiles,
   driverProfiles,
@@ -7,7 +8,7 @@ import { env } from '@/shared/config/env'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-const schema = { users, userTokens, clientProfiles, driverProfiles }
+const schema = { users, userTokens, clientProfiles, driverProfiles, auditLogs }
 
 const client = postgres(env.DATABASE_URL, {
   max: env.NODE_ENV === 'production' ? 20 : 5,

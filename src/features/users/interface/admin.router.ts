@@ -3,14 +3,17 @@ import { db } from '@/shared/config/database'
 import { ROLES } from '@/shared/constants/roles'
 import { Router } from 'express'
 
+import { AuditLogRepositoryImpl } from '@/features/audit/infrastructure/db/audit-log.repository.impl'
 import { RedisSessionStore } from '@/features/users/infrastructure/cache/redis.session.store'
 // Infrastructure
 import { UserRepositoryImpl } from '@/features/users/infrastructure/db/user.repository.impl'
 import { ResendEmailService } from '@/features/users/infrastructure/services/resend.email.service'
 import { TokenService } from '@/features/users/infrastructure/services/token.service'
+import { AuditService } from '@/shared/services/audit.service'
 
-import { ChangeUserRoleUseCase } from '@/features/users/application/use-cases/change-user-role.use-case'
+import { CreateAuditLogUseCase } from '@/features/audit/application/use-cases/create-audit-log.use-case'
 // Use Cases
+import { ChangeUserRoleUseCase } from '@/features/users/application/use-cases/change-user-role.use-case'
 import { CreateUserUseCase } from '@/features/users/application/use-cases/create-user.use-case'
 import { DeleteAccountUseCase } from '@/features/users/application/use-cases/delete-account.use-case'
 import { GetUserUseCase } from '@/features/users/application/use-cases/get-user.use-case'
@@ -31,13 +34,15 @@ const userRepository = new UserRepositoryImpl(db)
 const sessionStore = new RedisSessionStore(redisClient)
 const tokenService = new TokenService()
 const emailService = new ResendEmailService()
+const auditLogRepository = new AuditLogRepositoryImpl(db)
+const auditService = new AuditService(new CreateAuditLogUseCase(auditLogRepository))
 
 const controller = new AdminController(
   new CreateUserUseCase(userRepository, emailService, tokenService),
   new ListUsersUseCase(userRepository),
   new GetUserUseCase(userRepository),
-  new UpdateUserStatusUseCase(userRepository),
-  new ChangeUserRoleUseCase(userRepository),
+  new UpdateUserStatusUseCase(userRepository, auditService),
+  new ChangeUserRoleUseCase(userRepository, auditService),
   new DeleteAccountUseCase(userRepository, sessionStore)
 )
 

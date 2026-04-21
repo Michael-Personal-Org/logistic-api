@@ -82,7 +82,9 @@ export class ProfileController {
     try {
       const userId = String(req.params.userId ?? '')
       const approvedBy = req.user?.id ?? ''
-      const result = await this.approveClientProfile.execute({ userId, approvedBy })
+      const ipAddress = req.ip ?? ''
+
+      const result = await this.approveClientProfile.execute({ userId, approvedBy, ipAddress })
       res.status(200).json(ResponseUtils.success(result))
     } catch (error) {
       next(error)

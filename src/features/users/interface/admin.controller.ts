@@ -59,9 +59,14 @@ export class AdminController {
   updateUserStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const targetUserId = String(req.params.userId ?? '')
+      const performedBy = req.user?.id ?? ''
+      const ipAddress = req.ip ?? ''
+
       const result = await this.updateUserStatusUseCase.execute({
         targetUserId,
         newStatus: req.body.status,
+        performedBy,
+        ipAddress,
       })
       res.status(200).json(ResponseUtils.success(result))
     } catch (error) {
@@ -72,9 +77,14 @@ export class AdminController {
   changeUserRole = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const targetUserId = String(req.params.userId ?? '')
+      const performedBy = req.user?.id ?? ''
+      const ipAddress = req.ip ?? ''
+
       const result = await this.changeUserRoleUseCase.execute({
         targetUserId,
         newRole: req.body.role,
+        performedBy,
+        ipAddress,
       })
       res.status(200).json(ResponseUtils.success(result))
     } catch (error) {

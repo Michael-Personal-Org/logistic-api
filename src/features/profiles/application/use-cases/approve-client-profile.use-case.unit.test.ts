@@ -1,6 +1,7 @@
 import { ClientProfileEntity } from '@/features/profiles/domain/client-profile.entity'
 import { ProfileNotFoundError } from '@/features/profiles/domain/profile.errors'
 import type { IProfileRepository } from '@/features/profiles/domain/profile.repository'
+import type { AuditService } from '@/shared/services/audit.service'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApproveClientProfileUseCase } from './approve-client-profile.use-case'
 
@@ -29,10 +30,13 @@ const mockProfileRepository: IProfileRepository = {
   updateDriverProfile: vi.fn(),
 }
 
-function makeUseCase() {
-  return new ApproveClientProfileUseCase(mockProfileRepository)
-}
+const mockAuditService = {
+  log: vi.fn().mockResolvedValue(undefined),
+} as unknown as AuditService
 
+function makeUseCase() {
+  return new ApproveClientProfileUseCase(mockProfileRepository, mockAuditService)
+}
 describe('ApproveClientProfileUseCase', () => {
   beforeEach(() => {
     vi.clearAllMocks()

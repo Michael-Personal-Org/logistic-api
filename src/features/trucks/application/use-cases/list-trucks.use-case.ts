@@ -2,8 +2,8 @@ import type { CargoType } from '@/features/trucks/domain/truck.entity'
 import type { ITruckRepository } from '@/features/trucks/domain/truck.repository'
 
 export interface ListTrucksInput {
-  isAvailable?: boolean
-  cargoType?: CargoType
+  isAvailable?: boolean | undefined
+  cargoType?: CargoType | undefined
   page: number
   limit: number
 }

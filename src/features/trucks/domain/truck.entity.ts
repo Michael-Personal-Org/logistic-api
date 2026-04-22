@@ -38,7 +38,7 @@ export class TruckEntity {
   get capacity(): string {
     return this.props.capacity
   }
-  get allowedCargoType(): CargoType[] {
+  get allowedCargoTypes(): CargoType[] {
     return this.props.allowedCargoTypes
   }
   get isAvailable(): boolean {

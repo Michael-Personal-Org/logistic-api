@@ -1,5 +1,6 @@
 import { auditRouter } from '@/features/audit/interface/audit.router'
 import { profileRouter } from '@/features/profiles/interface/profile.router'
+import { truckRouter } from '@/features/trucks/interface/truck.router'
 import { adminRouter } from '@/features/users/interface/admin.router'
 import { userRouter } from '@/features/users/interface/user.router'
 import { healthRouter } from '@/shared/health/health.router'
@@ -48,6 +49,7 @@ export function createApp() {
   app.use('/api/v1/auth', userRouter)
   app.use('/api/v1/admin', adminRouter)
   app.use('/api/v1/profiles', profileRouter)
+  app.use('/api/v1/trucks', truckRouter)
   app.use('/api/v1/audit', auditRouter)
 
   // ---- 404 Handler ----

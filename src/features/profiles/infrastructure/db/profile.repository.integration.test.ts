@@ -1,6 +1,7 @@
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import { ClientProfileEntity } from '@/features/profiles/domain/client-profile.entity'
 import { DriverProfileEntity } from '@/features/profiles/domain/driver-profile.entity'
+import { trucks } from '@/features/trucks/infrastructure/db/truck.schema'
 import { userTokens, users } from '@/features/users/infrastructure/db/user.schema'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
@@ -13,10 +14,14 @@ import { clientProfiles, driverProfiles } from './profile.schema'
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL no está definida')
 
-const client = postgres(databaseUrl)
-const db = drizzle(client, {
-  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs },
+const client = postgres(databaseUrl, {
+  onnotice: () => {},
 })
+
+const db = drizzle(client, {
+  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks },
+})
+
 const repository = new ProfileRepositoryImpl(db)
 
 // ─── Helpers ─────────────────────────────────────────────

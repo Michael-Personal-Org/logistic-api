@@ -71,7 +71,9 @@ export class TruckRepositoryImpl implements ITruckRepository {
 
       // Para filtrar por tipo de carga usamos JSON contains
       if (cargoType) {
-        filters.push(sql`${trucks.allowedCargoTypes} @> ${JSON.stringify([cargoType])}::jsonb`)
+        filters.push(
+          sql`${trucks.allowedCargoTypes}::jsonb @> ${JSON.stringify([cargoType])}::jsonb`
+        )
       }
 
       const where = and(...filters)

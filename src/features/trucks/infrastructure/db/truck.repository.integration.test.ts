@@ -29,7 +29,7 @@ const repository = new TruckRepositoryImpl(db)
 function makeTruckEntity(overrides: Partial<Parameters<typeof TruckEntity.create>[0]> = {}) {
   return TruckEntity.create({
     id: crypto.randomUUID(),
-    plateNumber: `T${Date.now()}`,
+    plateNumber: `T${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
     model: 'Volvo FH16',
     capacity: '20 toneladas',
     allowedCargoTypes: ['GENERAL', 'FRAGILE'],

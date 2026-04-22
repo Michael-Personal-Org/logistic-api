@@ -1,5 +1,6 @@
-import winston from 'winston'
+import { log } from 'node:console'
 import { env } from '@/shared/config/env'
+import winston from 'winston'
 
 const { combine, timestamp, json, colorize, printf } = winston.format
 
@@ -22,3 +23,12 @@ export const logger = winston.createLogger({
     new winston.transports.File({ filename: 'logs/combined.log' }),
   ],
 })
+
+export function createRequestLogger(requestId: string) {
+  return {
+    info: (message: string, meta?: object) => logger.info(message, { requestId, ...meta }),
+    error: (message: string, meta?: object) => logger.error(message, { requestId, ...meta }),
+    warn: (message: string, meta?: object) => logger.warn(message, { requestId, ...meta }),
+    debug: (message: string, meta?: object) => logger.debug(message, { requestId, ...meta }),
+  }
+}

@@ -23,6 +23,11 @@ const envSchema = z.object({
 
   // App
   APP_URL: z.url('APP_URL debe ser una URL válida'),
+
+  // CORS - URLs de los 3 frontends
+  CORS_CLIENT_URL: z.url('CORS_CLIENT_URL debe ser una URL válida').optional(),
+  CORS_ADMIN_URL: z.url('CORS_ADMIN_URL debe ser una URL válida').optional(),
+  CORS_DRIVER_URL: z.url('CORS_DRIVER_URL debe ser una URL válida').optional(),
 })
 
 export type Env = z.infer<typeof envSchema>

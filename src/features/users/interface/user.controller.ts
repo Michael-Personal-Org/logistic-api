@@ -3,7 +3,9 @@ import type { NextFunction, Request, Response } from 'express'
 
 // Use Cases
 import type { ActivateAccountUseCase } from '@/features/users/application/use-cases/activate-account.use-case'
+import type { ChangePasswordUseCase } from '@/features/users/application/use-cases/change-password.use-case'
 import type { DeleteAccountUseCase } from '@/features/users/application/use-cases/delete-account.use-case'
+import type { Disable2FAUseCase } from '@/features/users/application/use-cases/disable-2fa.use-case'
 import type { Enable2FAUseCase } from '@/features/users/application/use-cases/enable-2fa.use-case'
 import type { LoginUseCase } from '@/features/users/application/use-cases/login.use-case'
 import type { LogoutUseCase } from '@/features/users/application/use-cases/logout.use-case'
@@ -22,7 +24,9 @@ export class UserController {
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly enable2FAUseCase: Enable2FAUseCase,
     private readonly verify2FAUseCase: Verify2FAUseCase,
-    private readonly deleteAccountUseCase: DeleteAccountUseCase
+    private readonly deleteAccountUseCase: DeleteAccountUseCase,
+    private readonly disable2FAUseCase: Disable2FAUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase
   ) {}
 
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -114,6 +118,47 @@ export class UserController {
         userId,
         password: req.body.password,
         accessToken,
+      })
+      res.status(200).json(ResponseUtils.success(result))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  verify2FASetup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user?.id ?? ''
+      const { code } = req.body
+      const result = await this.verify2FAUseCase.execute({
+        userId,
+        code,
+        isSetupVerification: true,
+      })
+      res.status(200).json(ResponseUtils.success(result))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  disable2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user?.id ?? ''
+      const { code } = req.body
+      const result = await this.disable2FAUseCase.execute({ userId, code })
+      res.status(200).json(ResponseUtils.success(result))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user?.id ?? ''
+      const { currentPassword, newPassword } = req.body
+      const result = await this.changePasswordUseCase.execute({
+        userId,
+        currentPassword,
+        newPassword,
       })
       res.status(200).json(ResponseUtils.success(result))
     } catch (error) {

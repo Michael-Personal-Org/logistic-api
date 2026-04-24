@@ -1,17 +1,18 @@
 import { redisClient } from '@/features/users/infrastructure/cache/redis.session.store'
 import { db } from '@/shared/config/database'
 import { Router } from 'express'
+import { z } from 'zod'
 
-// Infrastructure
 import { RedisSessionStore } from '@/features/users/infrastructure/cache/redis.session.store'
 import { UserRepositoryImpl } from '@/features/users/infrastructure/db/user.repository.impl'
 import { ResendEmailService } from '@/features/users/infrastructure/services/resend.email.service'
 import { TokenService } from '@/features/users/infrastructure/services/token.service'
 import { TotpService } from '@/features/users/infrastructure/services/totp.service'
 
-// Use Cases
 import { ActivateAccountUseCase } from '@/features/users/application/use-cases/activate-account.use-case'
+import { ChangePasswordUseCase } from '@/features/users/application/use-cases/change-password.use-case'
 import { DeleteAccountUseCase } from '@/features/users/application/use-cases/delete-account.use-case'
+import { Disable2FAUseCase } from '@/features/users/application/use-cases/disable-2fa.use-case'
 import { Enable2FAUseCase } from '@/features/users/application/use-cases/enable-2fa.use-case'
 import { LoginUseCase } from '@/features/users/application/use-cases/login.use-case'
 import { LogoutUseCase } from '@/features/users/application/use-cases/logout.use-case'
@@ -20,12 +21,9 @@ import { RegisterUseCase } from '@/features/users/application/use-cases/register
 import { ResetPasswordUseCase } from '@/features/users/application/use-cases/reset-password.use-case'
 import { Verify2FAUseCase } from '@/features/users/application/use-cases/verify-2fa.use-case'
 
-// Interface
 import { UserController } from './user.controller'
 import { authMiddleware, validateBody } from './user.middleware'
 
-import { DEFAULT_CIPHERS } from 'node:tls'
-// DTOs
 import { DeleteAccountDto } from './dtos/delete-account.dto'
 import { ForgotPasswordDto } from './dtos/forgot-password.dto'
 import { LoginDto } from './dtos/login.dto'
@@ -33,7 +31,6 @@ import { RegisterDto } from './dtos/register.dto'
 import { ResetPasswordDto } from './dtos/reset-password.dto'
 import { Verify2FADto } from './dtos/verify-2fa.dto'
 
-// Inyeccion de dependencia manual
 const userRepository = new UserRepositoryImpl(db)
 const sessionStore = new RedisSessionStore(redisClient)
 const tokenService = new TokenService()
@@ -49,12 +46,14 @@ const controller = new UserController(
   new ResetPasswordUseCase(userRepository),
   new Enable2FAUseCase(userRepository, totpService),
   new Verify2FAUseCase(userRepository, sessionStore, totpService),
-  new DeleteAccountUseCase(userRepository, sessionStore)
+  new DeleteAccountUseCase(userRepository, sessionStore),
+  new Disable2FAUseCase(userRepository, totpService),
+  new ChangePasswordUseCase(userRepository)
 )
 
 export const userRouter = Router()
 
-// Rutas publicas
+// Rutas públicas
 userRouter.post('/register', validateBody(RegisterDto), controller.register)
 userRouter.post('/login', validateBody(LoginDto), controller.login)
 userRouter.get('/activate', controller.activateAccount)
@@ -65,6 +64,29 @@ userRouter.post('/2fa/verify', validateBody(Verify2FADto), controller.verify2FA)
 // Rutas protegidas
 userRouter.post('/logout', authMiddleware, controller.logout)
 userRouter.post('/2fa/enable', authMiddleware, controller.enable2FA)
+userRouter.post(
+  '/2fa/verify-setup',
+  authMiddleware,
+  validateBody(z.object({ code: z.string().length(6) })),
+  controller.verify2FASetup
+)
+userRouter.post(
+  '/2fa/disable',
+  authMiddleware,
+  validateBody(z.object({ code: z.string().length(6) })),
+  controller.disable2FA
+)
+userRouter.post(
+  '/change-password',
+  authMiddleware,
+  validateBody(
+    z.object({
+      currentPassword: z.string().min(1),
+      newPassword: z.string().min(8),
+    })
+  ),
+  controller.changePassword
+)
 userRouter.delete(
   '/account',
   authMiddleware,

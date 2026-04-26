@@ -1,4 +1,5 @@
 import { auditRouter } from '@/features/audit/interface/audit.router'
+import { organizationRouter } from '@/features/organizations/interface/organization.router'
 import { profileRouter } from '@/features/profiles/interface/profile.router'
 import { truckRouter } from '@/features/trucks/interface/truck.router'
 import { adminRouter } from '@/features/users/interface/admin.router'
@@ -51,6 +52,7 @@ export function createApp() {
   app.use('/api/v1/profiles', profileRouter)
   app.use('/api/v1/trucks', truckRouter)
   app.use('/api/v1/audit', auditRouter)
+  app.use('/api/v1/organizations', organizationRouter)
 
   // ---- 404 Handler ----
   app.use((_req, res) => {

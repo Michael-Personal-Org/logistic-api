@@ -33,6 +33,10 @@ function makeDriver(overrides: Partial<Parameters<typeof UserEntity.create>[0]> 
     passwordHash: 'hash',
     firstName: 'John',
     lastName: 'Doe',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
     role: 'DRIVER',
     twoFactorSecret: null,
@@ -144,7 +148,7 @@ describe('AssignDriverUseCase', () => {
   describe('cuando el usuario no es DRIVER', () => {
     it('debe lanzar UserNotFoundError', async () => {
       vi.mocked(mockTruckRepository.findById).mockResolvedValue(makeTruck())
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(makeDriver({ role: 'CLIENT' }))
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(makeDriver({ role: 'ORG_ADMIN' }))
 
       const useCase = makeUseCase()
 

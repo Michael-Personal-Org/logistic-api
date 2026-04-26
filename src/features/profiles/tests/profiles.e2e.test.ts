@@ -1,5 +1,10 @@
 import { createApp } from '@/app'
 import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
+import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
@@ -25,7 +30,17 @@ const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL no está definida')
 
 const client = postgres(databaseUrl)
-const db = drizzle(client, { schema: { users, userTokens, clientProfiles, driverProfiles } })
+const db = drizzle(client, {
+  schema: {
+    users,
+    userTokens,
+    clientProfiles,
+    driverProfiles,
+    organizations,
+    organizationInvitations,
+    operatorOrganizations,
+  },
+})
 const app = createApp()
 
 beforeAll(async () => {
@@ -44,7 +59,9 @@ afterAll(async () => {
 })
 
 // ─── Helpers ─────────────────────────────────────────────
-async function createAndLoginUser(role: 'CLIENT' | 'DRIVER' | 'ADMIN' | 'OPERATOR' = 'CLIENT') {
+async function createAndLoginUser(
+  role: 'ORG_ADMIN' | 'DRIVER' | 'ADMIN' | 'OPERATOR' = 'ORG_ADMIN'
+) {
   const email = `test-${crypto.randomUUID()}@example.com`
   const password = 'Password1!'
 
@@ -55,6 +72,10 @@ async function createAndLoginUser(role: 'CLIENT' | 'DRIVER' | 'ADMIN' | 'OPERATO
     passwordHash: '',
     firstName: 'Test',
     lastName: 'User',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
     role,
     twoFactorEnabled: false,
@@ -83,7 +104,7 @@ async function createAndLoginUser(role: 'CLIENT' | 'DRIVER' | 'ADMIN' | 'OPERATO
 describe('Profiles E2E', () => {
   describe('POST /api/v1/profiles/client', () => {
     it('debe crear perfil de cliente correctamente', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       const res = await request(app)
         .post('/api/v1/profiles/client')
@@ -99,7 +120,7 @@ describe('Profiles E2E', () => {
     })
 
     it('debe retornar 409 si ya tiene perfil', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       await request(app)
         .post('/api/v1/profiles/client')
@@ -136,7 +157,7 @@ describe('Profiles E2E', () => {
 
   describe('GET /api/v1/profiles/client', () => {
     it('debe retornar el perfil del cliente', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       await request(app)
         .post('/api/v1/profiles/client')
@@ -153,7 +174,7 @@ describe('Profiles E2E', () => {
     })
 
     it('debe retornar 404 si no tiene perfil', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       const res = await request(app)
         .get('/api/v1/profiles/client')
@@ -165,7 +186,7 @@ describe('Profiles E2E', () => {
 
   describe('PUT /api/v1/profiles/client', () => {
     it('debe actualizar el perfil del cliente', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       await request(app)
         .post('/api/v1/profiles/client')
@@ -184,7 +205,7 @@ describe('Profiles E2E', () => {
 
   describe('PATCH /api/v1/profiles/client/:userId/approve', () => {
     it('debe aprobar el perfil de un cliente', async () => {
-      const { accessToken: clientToken, userId: clientId } = await createAndLoginUser('CLIENT')
+      const { accessToken: clientToken, userId: clientId } = await createAndLoginUser('ORG_ADMIN')
       const { accessToken: operatorToken } = await createAndLoginUser('OPERATOR')
 
       await request(app)
@@ -201,7 +222,7 @@ describe('Profiles E2E', () => {
     })
 
     it('debe retornar 403 si es CLIENT', async () => {
-      const { accessToken: clientToken, userId: clientId } = await createAndLoginUser('CLIENT')
+      const { accessToken: clientToken, userId: clientId } = await createAndLoginUser('ORG_ADMIN')
 
       await request(app)
         .post('/api/v1/profiles/client')
@@ -234,7 +255,7 @@ describe('Profiles E2E', () => {
     })
 
     it('debe retornar 403 si no es DRIVER', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       const res = await request(app)
         .post('/api/v1/profiles/driver')

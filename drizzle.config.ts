@@ -15,6 +15,7 @@ export default defineConfig({
     './src/features/profiles/infrastructure/db/profile.schema.ts',
     './src/features/audit/infrastructure/db/audit-log.schema.ts',
     './src/features/trucks/infrastructure/db/truck.schema.ts',
+    './src/features/organizations/infrastructure/db/organization.schema.ts',
   ],
   out: './src/db/migrations',
   dbCredentials: {

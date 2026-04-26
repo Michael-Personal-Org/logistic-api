@@ -17,8 +17,12 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
     passwordHash: 'hash',
     firstName: 'John',
     lastName: 'Doe',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
-    role: 'CLIENT',
+    role: 'ORG_ADMIN',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),
@@ -114,7 +118,7 @@ describe('CreateClientProfileUseCase', () => {
     })
   })
 
-  describe('cuando el usuario no es CLIENT', () => {
+  describe('cuando el usuario no tiene rol de organización', () => {
     it('debe lanzar InvalidRoleForProfileError', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(makeUser({ role: 'DRIVER' }))
 

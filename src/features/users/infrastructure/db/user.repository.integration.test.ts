@@ -1,5 +1,10 @@
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
+import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
@@ -22,7 +27,17 @@ const client = postgres(databaseUrl, {
 })
 
 const db = drizzle(client, {
-  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks },
+  schema: {
+    users,
+    userTokens,
+    clientProfiles,
+    driverProfiles,
+    auditLogs,
+    trucks,
+    organizations,
+    organizationInvitations,
+    operatorOrganizations,
+  },
 })
 const repository = new UserRepositoryImpl(db)
 
@@ -35,7 +50,11 @@ function makeUserEntity(overrides: Partial<Parameters<typeof UserEntity.create>[
     firstName: 'John',
     lastName: 'Doe',
     status: 'pending',
-    role: 'CLIENT',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
+    role: 'ORG_ADMIN',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),

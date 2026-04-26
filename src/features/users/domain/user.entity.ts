@@ -1,5 +1,6 @@
-export type UserStatus = 'pending' | 'active' | 'suspended'
-export type UserRole = 'CLIENT' | 'DRIVER' | 'OPERATOR' | 'ADMIN'
+import type { TokenType, UserRole, UserStatus } from './user.types'
+
+export type { UserRole, UserStatus, TokenType }
 
 export interface UserProps {
   id: string
@@ -7,6 +8,10 @@ export interface UserProps {
   passwordHash: string
   firstName: string
   lastName: string
+  phone: string | null
+  jobTitle: string | null
+  organizationId: string | null
+  mustChangePassword: boolean
   status: UserStatus
   role: UserRole
   twoFactorSecret: string | null
@@ -20,7 +25,7 @@ export interface UserTokenProps {
   id: string
   userId: string
   token: string
-  type: 'activation' | 'password_reset'
+  type: TokenType
   expiresAt: Date
   usedAt: Date | null
   createdAt: Date
@@ -94,7 +99,7 @@ export class UserEntity {
 
   // Helpers de rol
   isClient(): boolean {
-    return this.props.role === 'CLIENT'
+    return this.props.role === 'ORG_ADMIN'
   }
   isDriver(): boolean {
     return this.props.role === 'DRIVER'

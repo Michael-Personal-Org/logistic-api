@@ -1,6 +1,11 @@
 import { createApp } from '@/app'
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
+import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
@@ -27,7 +32,17 @@ if (!databaseUrl) throw new Error('DATABASE_URL no está definida')
 
 const client = postgres(databaseUrl, { onnotice: () => {} })
 const db = drizzle(client, {
-  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks },
+  schema: {
+    users,
+    userTokens,
+    clientProfiles,
+    driverProfiles,
+    auditLogs,
+    trucks,
+    organizationInvitations,
+    organizations,
+    operatorOrganizations,
+  },
 })
 const app = createApp()
 
@@ -49,7 +64,7 @@ afterAll(async () => {
 })
 
 // ─── Helpers ─────────────────────────────────────────────
-async function createAndLoginUser(role: 'CLIENT' | 'DRIVER' | 'ADMIN' | 'OPERATOR' = 'ADMIN') {
+async function createAndLoginUser(role: 'ORG_ADMIN' | 'DRIVER' | 'ADMIN' | 'OPERATOR' = 'ADMIN') {
   const email = `test-${crypto.randomUUID()}@example.com`
   const password = 'Password1!'
 
@@ -117,7 +132,7 @@ describe('Trucks E2E', () => {
     })
 
     it('debe retornar 403 si es CLIENT', async () => {
-      const { accessToken } = await createAndLoginUser('CLIENT')
+      const { accessToken } = await createAndLoginUser('ORG_ADMIN')
 
       const res = await request(app)
         .post('/api/v1/trucks')

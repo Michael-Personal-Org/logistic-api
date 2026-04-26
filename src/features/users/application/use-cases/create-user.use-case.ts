@@ -17,6 +17,10 @@ export interface CreateUserInput {
   firstName: string
   lastName: string
   role: UserRole
+  phone?: string | null
+  jobTitle?: string | null
+  organizationId?: string | null
+  mustChangePassword?: boolean
 }
 
 export interface CreateUserOutput {
@@ -27,7 +31,14 @@ export interface CreateUserOutput {
 }
 
 const ALLOWED_CREATIONS: Record<string, UserRole[]> = {
-  [ROLES.ADMIN]: [ROLES.CLIENT, ROLES.DRIVER, ROLES.OPERATOR, ROLES.ADMIN],
+  [ROLES.ADMIN]: [
+    ROLES.ORG_ADMIN,
+    ROLES.ORG_ORDER,
+    ROLES.ORG_TRACK,
+    ROLES.DRIVER,
+    ROLES.OPERATOR,
+    ROLES.ADMIN,
+  ],
   [ROLES.OPERATOR]: [ROLES.DRIVER],
 }
 
@@ -64,6 +75,10 @@ export class CreateUserUseCase {
       passwordHash,
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
+      phone: input.phone ?? null,
+      jobTitle: input.jobTitle ?? null,
+      organizationId: input.organizationId ?? null,
+      mustChangePassword: input.mustChangePassword ?? false,
       status: 'active',
       role: input.role,
       twoFactorSecret: null,

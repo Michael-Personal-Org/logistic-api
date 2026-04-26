@@ -1,15 +1,31 @@
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
+import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
 import { trucks } from '@/features/trucks/infrastructure/db/truck.schema'
 import { userTokens, users } from '@/features/users/infrastructure/db/user.schema'
 import { env } from '@/shared/config/env'
+import { or } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-const schema = { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks }
+const schema = {
+  users,
+  userTokens,
+  clientProfiles,
+  driverProfiles,
+  auditLogs,
+  trucks,
+  organizations,
+  organizationInvitations,
+  operatorOrganizations,
+}
 
 const client = postgres(env.DATABASE_URL, {
   max: env.NODE_ENV === 'production' ? 20 : 5,

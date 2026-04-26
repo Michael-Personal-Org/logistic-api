@@ -5,7 +5,14 @@ export const userStatusEnum = pgEnum('user_status', ['pending', 'active', 'suspe
 
 export const tokenTypeEnum = pgEnum('token_type', ['activation', 'password_reset'])
 
-export const userRoleEnum = pgEnum('user_role', ['CLIENT', 'DRIVER', 'OPERATOR', 'ADMIN'])
+export const userRoleEnum = pgEnum('user_role', [
+  'ADMIN',
+  'OPERATOR',
+  'DRIVER',
+  'ORG_ADMIN',
+  'ORG_ORDER',
+  'ORG_TRACK',
+])
 
 // --- Tabla principal ---
 export const users = pgTable('users', {
@@ -14,15 +21,14 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
+  phone: varchar('phone', { length: 50 }),
+  jobTitle: varchar('job_title', { length: 100 }),
+  organizationId: uuid('organization_id'),
+  mustChangePassword: boolean('must_change_password').notNull().default(false),
   status: userStatusEnum('status').notNull().default('pending'),
-
-  role: userRoleEnum('role').notNull().default('CLIENT'),
-
-  // 2FA
+  role: userRoleEnum('role').notNull().default('ORG_ADMIN'),
   twoFactorSecret: varchar('two_factor_secret', { length: 255 }),
   twoFactorEnabled: boolean('two_factor_enabled').notNull().default(false),
-
-  // Auditoría
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),

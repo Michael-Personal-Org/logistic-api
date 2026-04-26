@@ -49,7 +49,7 @@ export const profileRouter = Router()
 profileRouter.post(
   '/client',
   authMiddleware,
-  requireRole(ROLES.CLIENT),
+  requireRole(ROLES.ORG_ADMIN, ROLES.ORG_ORDER, ROLES.ORG_TRACK),
   validateBody(CreateClientProfileDto),
   controller.createMyClientProfile
 )
@@ -57,7 +57,7 @@ profileRouter.post(
 profileRouter.put(
   '/client',
   authMiddleware,
-  requireRole(ROLES.CLIENT),
+  requireRole(ROLES.ORG_ADMIN, ROLES.ORG_ORDER, ROLES.ORG_TRACK),
   validateBody(UpdateClientProfileDto),
   controller.updateMyClientProfile
 )
@@ -65,7 +65,7 @@ profileRouter.put(
 profileRouter.get(
   '/client',
   authMiddleware,
-  requireRole(ROLES.CLIENT),
+  requireRole(ROLES.ORG_ADMIN, ROLES.ORG_ORDER, ROLES.ORG_TRACK),
   controller.getMyClientProfile
 )
 

@@ -1,4 +1,9 @@
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
+import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
 import { ClientProfileEntity } from '@/features/profiles/domain/client-profile.entity'
 import { DriverProfileEntity } from '@/features/profiles/domain/driver-profile.entity'
 import { trucks } from '@/features/trucks/infrastructure/db/truck.schema'
@@ -19,13 +24,23 @@ const client = postgres(databaseUrl, {
 })
 
 const db = drizzle(client, {
-  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks },
+  schema: {
+    users,
+    userTokens,
+    clientProfiles,
+    driverProfiles,
+    auditLogs,
+    trucks,
+    organizations,
+    organizationInvitations,
+    operatorOrganizations,
+  },
 })
 
 const repository = new ProfileRepositoryImpl(db)
 
 // ─── Helpers ─────────────────────────────────────────────
-async function createTestUser(role: 'CLIENT' | 'DRIVER' | 'OPERATOR' | 'ADMIN' = 'CLIENT') {
+async function createTestUser(role: 'ORG_ADMIN' | 'DRIVER' | 'OPERATOR' | 'ADMIN' = 'ORG_ADMIN') {
   const id = crypto.randomUUID()
   await db.insert(users).values({
     id,
@@ -33,6 +48,10 @@ async function createTestUser(role: 'CLIENT' | 'DRIVER' | 'OPERATOR' | 'ADMIN' =
     passwordHash: 'hash',
     firstName: 'Test',
     lastName: 'User',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
     role,
     twoFactorEnabled: false,
@@ -89,7 +108,7 @@ afterAll(async () => {
 describe('ProfileRepositoryImpl', () => {
   describe('Client Profiles', () => {
     it('debe guardar y recuperar un perfil de cliente', async () => {
-      const userId = await createTestUser('CLIENT')
+      const userId = await createTestUser('ORG_ADMIN')
       const profile = makeClientProfile(userId)
 
       await repository.saveClientProfile(profile)
@@ -106,7 +125,7 @@ describe('ProfileRepositoryImpl', () => {
     })
 
     it('debe actualizar el perfil de cliente', async () => {
-      const userId = await createTestUser('CLIENT')
+      const userId = await createTestUser('ORG_ADMIN')
       const operatorId = await createTestUser('OPERATOR')
       const profile = makeClientProfile(userId)
       await repository.saveClientProfile(profile)

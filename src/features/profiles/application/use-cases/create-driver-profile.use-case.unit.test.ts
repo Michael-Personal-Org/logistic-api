@@ -16,6 +16,10 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
     passwordHash: 'hash',
     firstName: 'John',
     lastName: 'Doe',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
     role: 'DRIVER',
     twoFactorSecret: null,
@@ -108,7 +112,7 @@ describe('CreateDriverProfileUseCase', () => {
 
   describe('cuando el usuario no es DRIVER', () => {
     it('debe lanzar InvalidRoleForProfileError', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(makeUser({ role: 'CLIENT' }))
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(makeUser({ role: 'ORG_ADMIN' }))
 
       const useCase = makeUseCase()
 

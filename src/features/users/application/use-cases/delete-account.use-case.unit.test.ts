@@ -19,8 +19,12 @@ function makeUser(overrides: Partial<Parameters<typeof UserEntity.create>[0]> = 
     passwordHash: '',
     firstName: 'John',
     lastName: 'Doe',
+    phone: null,
+    jobTitle: null,
+    organizationId: null,
+    mustChangePassword: false,
     status: 'active',
-    role: 'CLIENT',
+    role: 'ORG_ADMIN',
     twoFactorSecret: null,
     twoFactorEnabled: false,
     createdAt: new Date(),
@@ -70,7 +74,7 @@ describe('DeleteAccountUseCase', () => {
     accessToken = jwtUtils.signAccessToken({
       sub: 'user-123',
       email: 'john@example.com',
-      role: 'CLIENT',
+      role: 'ORG_ADMIN',
     })
     passwordHash = await hash('Password1!')
   })

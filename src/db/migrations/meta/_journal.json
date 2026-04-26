@@ -36,6 +36,20 @@
       "when": 1776797904138,
       "tag": "0004_moaning_rafael_vega",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777234466541,
+      "tag": "0005_plain_sentinel",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777234511693,
+      "tag": "0006_blushing_bastion",
+      "breakpoints": true
     }
   ]
 }

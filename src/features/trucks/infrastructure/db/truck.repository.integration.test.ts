@@ -1,5 +1,10 @@
 import { auditLogs } from '@/features/audit/infrastructure/db/audit-log.schema'
 import {
+  operatorOrganizations,
+  organizationInvitations,
+  organizations,
+} from '@/features/organizations/infrastructure/db/organization.schema'
+import {
   clientProfiles,
   driverProfiles,
 } from '@/features/profiles/infrastructure/db/profile.schema'
@@ -21,7 +26,17 @@ const client = postgres(databaseUrl, {
 })
 
 const db = drizzle(client, {
-  schema: { users, userTokens, clientProfiles, driverProfiles, auditLogs, trucks },
+  schema: {
+    users,
+    userTokens,
+    clientProfiles,
+    driverProfiles,
+    auditLogs,
+    trucks,
+    organizations,
+    organizationInvitations,
+    operatorOrganizations,
+  },
 })
 const repository = new TruckRepositoryImpl(db)
 
